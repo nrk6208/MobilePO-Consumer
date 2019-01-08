@@ -1,0 +1,92 @@
+<!-- <ion-header *ngIf = "isLoggedIn">
+  <ion-toolbar>
+    <ion-title>
+      Login
+    </ion-title>
+  </ion-toolbar>
+</ion-header> -->
+
+<ion-content padding>
+  <!-- <form (submit)="doLogin()" #form>
+    <ion-list>      
+      <ion-item>
+        <ion-label floating>User Name</ion-label>
+        <ion-input type="text" [(ngModel)]="account.USER_NAME" name="userName" required></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label floating>Password</ion-label>
+        <ion-input type="password" [(ngModel)]="account.USER_PASSWORD" name="password" required></ion-input>
+      </ion-item>
+
+      <div padding>
+        <button ion-button color="primary" block>Submit</button>
+      </div>
+
+    </ion-list>
+  </form> -->
+  <div class="container"  [ngClass]="{'mbileMode':routerExtensionsService.isMobile}">
+      <!-- d-none d-sm-none d-md-block d-lg-block d-xl-block -->
+      <div class="row login-head justify-content-center">
+        <h4>Log in</h4>
+      </div>
+      <div class="row login-body">
+        <div class="left justify-content-center align-items-center">
+          <!-- <div class="social-buttons">
+            <div class="social-button fb" (click)="fbLogin()">
+              <div class="button-wrapper">
+                <div class="icon">
+                  <fa class="fa fa-facebook" name="facebookIcon"></fa>
+                </div>
+                <span>Continue with Facebook</span>
+              </div>
+            </div>
+            <div class="social-button ln" (click)="lnLogin()">
+              <div class="button-wrapper">
+                <div class="icon">
+                  <fa class="fa fa-linkedin" name="linkedinIcon"></fa>
+                </div>
+                <span>Continue with Linkedin</span>
+              </div>
+            </div>
+          </div> -->
+          <img class="logo" [src]="appConfig.getLogo()" alt="logo" />
+        </div>
+        <div class="divider"></div>
+        <div class="right justify-content-center align-items-center">
+          <form [formGroup]="form" (ngSubmit)="form.valid && onSubmit()" novalidate>
+            <fieldset class="form-group" [ngClass]="{error:formErrors.USER_NAME}">
+              <label for="UserName" class="control-label">UserName *</label>
+              <input type="text" class="form-control" placeholder="UserName" formControlName="USER_NAME" />
+              <span *ngIf="formErrors.USER_NAME">{{formErrors.USER_NAME}}</span>
+            </fieldset>
+    
+            <fieldset class="form-group">
+              <label for="password" class="control-label">Password *</label>
+              <input type="password" class="form-control" placeholder="Password" formControlName="USER_PASSWORD" />
+              <span [ngClass]="{error:formErrors.USER_PASSWORD}" *ngIf="formErrors.USER_PASSWORD">{{formErrors.USER_PASSWORD}}</span>
+            </fieldset>
+            <!-- <a roterLink="/forgotpassword" class="float-right text-muted pwd">
+              <small>Forgot Password ?</small>
+            </a> -->
+            <!-- <div class="button-group"> -->
+              <div [ngClass]="{'float-right':this.routerExtensionsService.isMobile}">
+                <ion-button class="justify-content-center" id="form-submit" type="submit" color="primary" [disabled]="form.invalid" round>Login</ion-button>
+              </div>
+              <!-- <button type="submit" ion-button [class.button-disabled]="form.invalid" color="primary" round outline>
+                
+                Login
+              </button> -->
+            <!-- </div> -->
+          </form>
+        </div>
+      </div>
+      <!-- <div class="row row justify-content-center form-footer form-footer">
+        <small>Don't have an account?
+          <a routerLink="/signup" (click)="closeDialog()">
+            <b>Register Now</b>
+          </a>
+        </small>
+      </div> -->
+    
+    </div>
+</ion-content>

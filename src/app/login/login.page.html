@@ -1,0 +1,69 @@
+<ion-content padding class="mx-2">
+  <div class="responsive-div">
+    <!-- <div class="row justify-content-center">
+    <div class="d-none d-sm-none d-md-block d-lg-block d-xl-block">
+        <h4>Log in</h4>
+    </div>
+  </div> -->
+    <div class="mt-5 mx-3 row login-body justify-content-center">
+      <div class="col-sm-8 col-md-5 col-lg-5 col-xl-5 text-center">
+        <img class="logo mb-5" [class.mt-5]="!commonService.isMobile" [src]="appConfig.getLogo()" alt="logo" />
+      </div>
+      <div class="divider d-none d-sm-none d-md-block d-lg-block d-xl-block"></div>
+      <div class="col-sm-8 col-md-1 col-lg-1 col-xl-1 d-none d-sm-none d-md-block d-lg-block d-xl-block"></div>
+      <div class="pt-4 col-sm-8 col-md-4 col-lg-4 col-xl-4" *ngIf="showLoginScreen">
+        <form [formGroup]="loginForm" (ngSubmit)="loginForm.valid && onLoginSubmit()" novalidate>
+          <div class="form-group" [ngClass]="{error:loginFormErrors.USER_NAME}">
+            <label for="UserName">UserName *</label>
+            <input type="email" class="form-control" id="loginFormUserName" placeholder="UserName" formControlName="USER_NAME" />
+            <!-- <span *ngIf="loginFormErrors.USER_NAME">{{loginFormErrors.USER_NAME}}</span> -->
+          </div>
+
+          <div class="form-group" [ngClass]="{error:loginFormErrors.USER_PASSWORD}">
+            <label for="Password" class="control-label">Password *</label>
+            <input type="password" class="form-control" id="loginFormPassword" placeholder="Password" formControlName="USER_PASSWORD"
+              (keyup.enter)="loginForm.valid && onLoginSubmit()" />
+            <!-- <span [ngClass]="{error:loginFormErrors.USER_PASSWORD}" *ngIf="loginFormErrors.USER_PASSWORD">{{loginFormErrors.USER_PASSWORD}}</span> -->
+          </div>
+          <div [ngClass]="{'text-center':true}">
+            <ion-button type="submit" color="primary" [disabled]="loginForm.invalid">
+              Login &nbsp;<ion-icon name="log-in"></ion-icon>
+            </ion-button>
+            <!-- <ion-button class="justify-content-center" id="form-submit" type="submit" color="primary" [disabled]="loginForm.invalid">Login</ion-button> -->
+          </div>
+        </form>
+      </div>
+      <div class="col-sm-8 col-md-4 col-lg-4 col-xl-4" *ngIf="!showLoginScreen">
+        <form [formGroup]="passwordForm" [style.padding-top]="!showLoginScreen ? '3em' : 'Inherit'" (ngSubmit)="passwordForm.valid && onPasswordSubmit()" novalidate>
+          <div class="form-group" [ngClass]="{error:passwordFormErrors.USER_NAME}">
+            <label for="UserName">UserName *</label>
+            <input type="email" class="form-control" id="passwordFormUserName" placeholder="UserName" formControlName="USER_NAME" (keyup.enter)="passwordForm.valid && onPasswordSubmit()" />
+            <!-- <span *ngIf="passwordFormErrors.USER_NAME">{{passwordFormErrors.USER_NAME}}</span> -->
+          </div>
+          <div [ngClass]="{'text-center':true}">
+            <!--commonService.isMobile-->
+            <ion-button id="form-submit" type="submit" color="primary" [disabled]="passwordForm.invalid">
+                <ion-button type="submit" color="primary" [disabled]="loginForm.invalid">
+                    Submit &nbsp;<ion-icon name="log-in"></ion-icon>
+                  </ion-button>  
+            </ion-button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <div class="row justify-content-center form-footer" *ngIf="showLoginScreen">
+      <small>Forgot the password?
+        <a href="javascript:void(0)" (click)="showLoginScreen=false">
+          <b>Click here !</b>
+        </a>
+      </small>
+    </div>
+    <div class="row justify-content-center form-footer" *ngIf="!showLoginScreen">
+      <small>Know the password?
+        <a href="javascript:void(0)" (click)="showLoginScreen=true">
+          <b>Login</b>
+        </a>
+      </small>
+    </div>
+  </div>
+</ion-content>

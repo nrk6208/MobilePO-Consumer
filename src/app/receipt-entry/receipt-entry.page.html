@@ -1,0 +1,144 @@
+<app-app-header name="Receipt Entry"></app-app-header>
+<ion-content padding>
+  <div *ngIf="commonService.isMobile then MainContent; else DesktopContent"></div>
+</ion-content>
+<ng-template #ConfirmModal>
+  <div class="modal-header">
+    <h4 class="modal-title pull-left">Confirmation:</h4>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="hideGateEnteyModal()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    Do you really confirm & submit the received quantity?
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-default" (click)="hideConfirmationModal(true)">Yes</button>
+    <button type="button" class="btn btn-default" (click)="hideConfirmationModal(false)">No</button>
+  </div>
+</ng-template>
+<ng-template #DesktopContent>
+  <ion-card class="content-card pb-1">
+    <ion-card-header>
+      Receipt Entry
+    </ion-card-header>
+    <ng-container *ngTemplateOutlet="MainContent"></ng-container>
+  </ion-card>
+</ng-template>
+<ng-template #MainContent>
+  <div class="row ml-0">
+    <div class="col-sm-8 col-md-8 col-lg-8 col-xl-8" padding>
+      <ion-item no-padding>
+        <ion-input type="text" placeholder="Search by GateEntry Number" [(ngModel)]="gateEntryNumber" (keyup.enter)="invoiceNumber!='' && fetch()"></ion-input>
+        <img style="filter:sepia(45%)" src="../../assets/images/barcode.png" [style.width.em]="2.5" alt="scan" (click)="scan()" *ngIf="commonService.isMobile" />
+      </ion-item>
+    </div>
+    <div class="col-sm-4 col-md-4 col-lg-4 col-xl-4 text-center" padding>
+      <ion-button color="primary" block (click)="fetch()" [disabled]="gateEntryNumber==''">Search</ion-button>
+    </div>
+  </div>
+  <div scrollX="true" scrollY="true" zoom="false">
+    <ion-grid class="pt-0" *ngIf="gateEntry && gateEntry.Order && gateEntry.Order.Lines.length > 0;else NoContent">
+      <!--(gateEntry!=null || gateEntry!=undefined)-->
+      <ion-row>
+        <ion-col class="row col-12 col-sm-12 col-md-12 col-lg-6 col-xl-6" *ngIf="gateEntry.GateEntryNumber">
+          <span class="grid-header col-6">GateEntry Number</span>:&nbsp;
+          <span class="col-*">{{gateEntry.GateEntryNumber}}</span>
+        </ion-col>
+        <ion-col class="row col-12 col-sm-12 col-md-12 col-lg-6 col-xl-6" *ngIf="gateEntry.InvoiceNumber">
+          <span class="grid-header col-6">Invoice Number</span>:&nbsp;
+          <span class="col-*">{{gateEntry.InvoiceNumber}}</span>
+        </ion-col>
+        <!-- <ion-col class="row col-12 col-sm-12 col-md-12 col-lg-6 col-xl-6" *ngIf="gateEntry.LorryNumber">
+            <span class="grid-header col-6">Lorry Number</span>:&nbsp;
+            <span class="col-*">{{gateEntry.LorryNumber}}</span>
+          </ion-col> -->
+        <ion-col class="row col-12 col-sm-12 col-md-12 col-lg-6 col-xl-6" *ngIf="gateEntry.Order.OrderNumber">
+          <span class="grid-header col-6">Order Number</span>:&nbsp;
+          <span class="col-*">{{gateEntry.Order.OrderNumber}}</span>
+        </ion-col>
+        <ion-col class="row col-12 col-sm-12 col-md-12 col-lg-6 col-xl-6">
+          <span class="grid-header col-6">Total Ordered Quantity</span>:&nbsp;
+          <span class="col-*">{{getTotalOrderedQuantity() || '0'}}</span>
+        </ion-col>
+        <ion-col class="row col-12 col-sm-12 col-md-12 col-lg-6 col-xl-6">
+          <span class="grid-header col-6">Total Shipped Quantity</span>:&nbsp;
+          <span class="col-*">{{getTotalShippedQuantity() || '0'}}</span>
+        </ion-col>
+      </ion-row>
+      <br />
+      <ion-list class="collapse-list">
+        <div *ngFor="let item of gateEntry.Order.Lines; index as i">
+          <ion-item (click)="gateEntry.Order.Lines=commonService.toggleCollapseList(i, gateEntry.Order.Lines)">
+            <ion-icon color="primary" [name]="item.icon"></ion-icon>
+            {{gateEntry.Order.OrderNumber + '-' + item.OrderLineNumber}}
+          </ion-item>
+          <div class="item-data" *ngIf="item.showDetails">
+            <ion-grid class="pt-0">
+              <ion-row nowrap>
+                <ion-col class="row">
+                  <span class="grid-header col-5 col-lg-4 col-xl-4">OrderNo</span>:&nbsp;
+                  <span class="col-* col-lg-* col-xl-*">{{gateEntry.Order.OrderNumber || '-'}}</span>
+                </ion-col>
+              </ion-row>
+              <ion-row nowrap>
+                <ion-col class="row">
+                  <span class="grid-header col-5 col-lg-4 col-xl-4">LineNo</span>:&nbsp;
+                  <span class="col-* col-lg-* col-xl-*">{{item.OrderLineNumber || '-'}}</span>
+                </ion-col>
+              </ion-row>
+              <ion-row nowrap>
+                <ion-col class="row">
+                  <span class="grid-header col-5 col-lg-4 col-xl-4">Ordered Quantity</span>:&nbsp;
+                  <span class="col-* col-lg-* col-xl-*">{{item.Quantity || '0'}}</span>
+                </ion-col>
+              </ion-row>
+              <ion-row nowrap>
+                <ion-col class="row">
+                  <span class="grid-header col-5 col-lg-4 col-xl-4">Shipped Quantity</span>:&nbsp;
+                  <span class="col-* col-lg-* col-xl-*">{{item.ShippedQuantity || '0'}}</span>
+                </ion-col>
+              </ion-row>
+              <ion-row nowrap>
+                <ion-col class="row">
+                  <span class="grid-header col-5 col-lg-4 col-xl-4">Received Quantity</span>:&nbsp;
+                  <ion-input no-padding type="number" [readonly]="gateEntry && gateEntry.ReceiptId!=null" [ngClass]="{'col-input-border': gateEntry && gateEntry.ReceiptId==null}" class="col-input col-* col-lg-2 col-xl-2"
+                    placeholder="0" clearInput [max]="item.ShippedQuantity" min=0 [(ngModel)]="item.DeliveredQuantity"
+                    (focusout)="ReceivedQuantityChange(item, $event)"></ion-input>
+                </ion-col>
+              </ion-row>
+              <ion-row nowrap>
+                <ion-col class="row">
+                  <span class="grid-header col-5 col-lg-4 col-xl-4">LorryNo</span>:&nbsp;
+                  <span class="col-* col-lg-* col-xl-*">{{gateEntry.LorryNumber || '-'}}</span>
+                </ion-col>
+              </ion-row>
+              <ion-row nowrap>
+                <ion-col class="row">
+                  <span class="grid-header col-5 col-lg-4 col-xl-4">ShippedOn</span>:&nbsp;
+                  <span class="col-* col-lg-* col-xl-*">{{gateEntry.ShipmentDate | date:'yyyy-MMM-dd HH:mm:ss'}}</span>
+                </ion-col>
+              </ion-row>
+              <ion-row nowrap>
+                <ion-col class="row">
+                  <span class="grid-header col-5 col-lg-4 col-xl-4">InvoiceNo</span>:&nbsp;
+                  <span class="col-* col-lg-* col-xl-*">{{gateEntry.InvoiceNumber || '-'}}</span>
+                </ion-col>
+              </ion-row>
+            </ion-grid>
+          </div>
+        </div>
+      </ion-list>
+    </ion-grid>
+    <ng-template #NoContent>
+      <ion-row text-center nowrap>
+        <ion-col>
+          No records found.
+        </ion-col>
+      </ion-row>
+    </ng-template>
+  </div>
+  <div padding class="text-center" *ngIf="gateEntry && gateEntry.ReceiptId==null">
+    <ion-button color="primary" block (click)="openConfirmationModal()">Submit</ion-button>
+  </div>
+</ng-template>

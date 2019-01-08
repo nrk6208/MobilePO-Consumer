@@ -1,0 +1,194 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-buttons slot="end" *ngIf="!commonService.isMobile">
+      <ion-button (click)="authService.logout()">
+        <ion-icon name="log-out" class="logout"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title *ngIf="commonService.isMobile">
+      Gate Entry
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content padding>
+  <div class="row">
+    <div class="col-sm-8 col-md-8 col-lg-8 col-xl-8" padding>
+      <ion-item>
+        <ion-input type="text" placeholder="Invoice Number" [(ngModel)]="invoiceNumber" (keyup.enter)="invoiceNumber!='' && fetch()"></ion-input>
+        <img src="../../assets/images/barcode.png" [style.width.em]="2.5" alt="scan" (click)="scan()" *ngIf="commonService.isMobile"/>
+      </ion-item>
+    </div>
+    <div class="col-sm-4 col-md-4 col-lg-4 col-xl-4 text-center" padding>
+      <ion-button color="primary" block (click)="fetch()" [disabled]="invoiceNumber==''">fetch</ion-button>
+    </div>
+  </div>
+  <div scrollX="true" scrollY="true" zoom="false" padding>
+      <ion-grid *ngIf="shipments.length > 0;else NoContent">
+        <div class="d-none d-sm-none d-md-block d-lg-block d-xl-block">
+          <ion-row text-center nowrap class="grid-row">
+            <ion-col class="grid-header">OrderNo</ion-col>
+            <ion-col class="grid-header">LineNo</ion-col>
+            <ion-col class="grid-header">Quantity</ion-col>
+            <ion-col class="grid-header">LorryNo</ion-col>
+            <ion-col class="grid-header">ShipmentOn</ion-col>
+            <ion-col class="grid-header" *ngIf="canColumnHide()">GateEntryNo</ion-col>
+          </ion-row>
+          <ion-row text-center nowrap *ngFor="let item of shipments">
+            <ion-col>
+              {{item.OrderNumber || '-'}}
+            </ion-col>
+            <ion-col>
+                {{item.OrderLineNumber || '-'}}
+            </ion-col>
+            <ion-col>
+                {{item.Quantity || '0'}}
+            </ion-col>
+            <ion-col>
+                {{item.LorryNumber || '-'}}
+            </ion-col>
+            <ion-col>
+                {{item.ShipmentDate | date:'dd-MMM-yyyy'}}
+            </ion-col>
+            <ion-col *ngIf="canColumnHide()">
+                {{item.GateEntryNumber || '-'}}
+            </ion-col>
+          </ion-row>
+        </div>
+        <div class="d-block d-sm-block d-md-none d-lg-none d-xl-none">
+          <!-- <div *ngFor="let item of shipments" class="grid-record">
+            <ion-row nowrap>
+                <ion-col class="row">
+                  <span class="grid-header col-sm-5 col-5">OrderNo</span>:&nbsp;
+                  <span class="col-* col-sm-*">{{item.OrderNumber}}</span>
+                </ion-col>
+            </ion-row>
+            <ion-row nowrap>
+              <ion-col class="row">
+                  <span class="grid-header col-sm-5 col-5">LineNo</span>:&nbsp;
+                  <span class="col-* col-sm-*">{{item.OrderLineNumber}}</span>
+              </ion-col>
+            </ion-row>
+            <ion-row nowrap>
+              <ion-col class="row">
+                  <span class="grid-header col-sm-5 col-5">Quantity</span>:&nbsp;
+                  <span class="col-* col-sm-*">{{item.Quantity}}</span>
+              </ion-col>
+            </ion-row>
+            <ion-row nowrap>
+              <ion-col class="row">
+                  <span class="grid-header col-sm-5 col-5">LorryNo</span>:&nbsp;
+                  <span class="col-* col-sm-*">{{item.LorryNumber}}</span>
+              </ion-col>
+            </ion-row>
+            <ion-row nowrap>
+              <ion-col class="row">
+                  <span class="grid-header col-sm-5 col-5">ShipmentOn</span>:&nbsp;
+                  <span class="col-* col-sm-*">{{item.ShipmentDate}}</span>
+              </ion-col>
+            </ion-row>
+            <ion-row nowrap *ngIf="canColumnHide()">
+              <ion-col class="row">
+                  <span class="grid-header col-sm-5 col-5">GateEntryNo</span>:&nbsp;
+                  <span class="col-* col-sm-*">{{item.GateEntryNumber}}</span>
+              </ion-col>
+            </ion-row>
+          </div> -->
+            <ion-row nowrap *ngIf="invoiceNumber">
+                <ion-col class="row">
+                  <span class="grid-header col-5 col-sm-5 col-md-4 col-lg-3 col-xl-2">Invoice Number</span>:&nbsp;
+                  <span class="col-* col-sm-* col-md-* col-lg-* col-xl-*">{{invoiceNumber}}</span>
+                </ion-col>
+            </ion-row>
+            <ion-row nowrap *ngIf="shipments[0].GateEntryNumber">
+                <ion-col class="row">
+                  <span class="grid-header col-5 col-sm-5 col-md-4 col-lg-3 col-xl-2">GateEntry Number</span>:&nbsp;
+                  <span class="col-* col-sm-* col-md-* col-lg-* col-xl-*">{{shipments[0].GateEntryNumber}}</span>
+                </ion-col>
+            </ion-row>
+            <ion-row nowrap *ngIf="shipments[0].LorryNumber">
+                <ion-col  class="row">
+                  <span class="grid-header col-5 col-sm-5 col-md-4 col-lg-3 col-xl-2">Lorry Number</span>:&nbsp;
+                  <span class="col-* col-sm-* col-md-* col-lg-* col-xl-*">{{shipments[0].LorryNumber}}</span>
+                </ion-col>
+            </ion-row>
+            <hr />
+            <ion-list class="collapse-list">
+              <div *ngFor="let item of shipments; index as i">
+                <ion-item padding (click)="shipments=commonService.toggleCollapseList(i, shipments)">
+                  <ion-icon color="primary" [name]="item.icon"></ion-icon>
+                  {{item.OrderNumber + '-' + item.OrderLineNumber}}
+                </ion-item>
+                <div class="item-data" *ngIf="item.showDetails">
+                  <ion-grid>
+                    <ion-row nowrap>
+                      <ion-col class="row">
+                        <span class="grid-header col-sm-5 col-5">OrderNo</span>:&nbsp;
+                        <span class="col-* col-sm-*">{{item.OrderNumber || '-'}}</span>
+                      </ion-col>
+                    </ion-row>
+                    <ion-row nowrap>
+                      <ion-col class="row">
+                        <span class="grid-header col-sm-5 col-5">LineNo</span>:&nbsp;
+                        <span class="col-* col-sm-*">{{item.OrderLineNumber || '-'}}</span>
+                      </ion-col>
+                    </ion-row>
+                    <ion-row nowrap>
+                      <ion-col class="row">
+                        <span class="grid-header col-sm-5 col-5">Quantity</span>:&nbsp;
+                        <span class="col-* col-sm-*">{{item.Quantity || '0'}}</span>
+                      </ion-col>
+                    </ion-row>
+                    <ion-row nowrap>
+                      <ion-col class="row">
+                        <span class="grid-header col-sm-5 col-5">LorryNo</span>:&nbsp;
+                        <span class="col-* col-sm-*">{{item.LorryNumber || '-'}}</span>
+                      </ion-col>
+                    </ion-row>
+                    <ion-row nowrap>
+                      <ion-col class="row">
+                        <span class="grid-header col-sm-5 col-5">ShipmentOn</span>:&nbsp;
+                        <span class="col-* col-sm-*">{{item.ShipmentDate | date:'dd-MMM-yyyy'}}</span>
+                      </ion-col>
+                    </ion-row>
+                    <ion-row nowrap *ngIf="canColumnHide()">
+                      <ion-col class="row">
+                        <span class="grid-header col-sm-5 col-5">GateEntryNo</span>:&nbsp;
+                        <span class="col-* col-sm-*">{{item.GateEntryNumber || '-'}}</span>
+                      </ion-col>
+                    </ion-row>
+                  </ion-grid>
+                </div>
+              </div>
+            </ion-list>
+          </div>
+        </ion-grid>
+      <ng-template #NoContent>
+        <ion-row text-center nowrap>
+          <ion-col>
+            No records found.
+          </ion-col>
+        </ion-row>
+      </ng-template>
+  </div>
+  <div padding class="text-center" *ngIf="!canColumnHide()">
+    <ion-button color="primary" block (click)="gateIn()">Gate-In</ion-button>
+  </div>
+</ion-content>
+<ng-template #template>
+    <div class="modal-header">
+      <h4 class="modal-title pull-left">Gate Entry Number:</h4>
+      <button type="button" class="close pull-right" aria-label="Close" (click)="hideGateEnteyModal()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body text-center">
+      <img [src]="'http://barcodes4.me/barcode/c128b/'+gateEntryNumber+'.png?IsTextDrawn=1&IsBorderDrawn=0'" alt="Image"/>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-default" (click)="hideGateEnteyModal()">Close</button>
+      </div>
+  </ng-template>

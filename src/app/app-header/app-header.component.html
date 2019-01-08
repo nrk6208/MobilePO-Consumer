@@ -1,0 +1,15 @@
+<ion-header>
+  <ion-toolbar [color]="commonService.isMobile?'primary':'nb-head'">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-buttons slot="end" *ngIf="!commonService.isMobile">
+      <ion-button (click)="authService.logout()">
+        <ion-icon name="log-out" class="logout"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title *ngIf="commonService.isMobile">
+      {{name}}
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
